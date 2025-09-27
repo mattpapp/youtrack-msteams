@@ -1,4 +1,4 @@
-package app;
+package config;
 
 public class Config {
   public final String ytBaseUrl;

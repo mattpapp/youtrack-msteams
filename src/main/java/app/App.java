@@ -1,8 +1,9 @@
 package app;
 
+import clients.YouTrackClient;
+import config.Config;
+import entities.Activity;
 import java.util.List;
-import youtrack.Activity;
-import youtrack.YouTrackClient;
 
 public class App {
   public static void main(String[] args) {
