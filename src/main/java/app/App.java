@@ -9,5 +9,8 @@ public class App {
 
     int count = client.getNotificationCount();
     System.out.println("Found " + count + " notifications");
+
+    String notifications = client.getNotifications();
+    System.out.println("Raw data: " + notifications);
   }
 }

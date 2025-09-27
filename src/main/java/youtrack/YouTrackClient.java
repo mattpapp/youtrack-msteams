@@ -41,4 +41,28 @@ public class YouTrackClient {
       return -1;
     }
   }
+
+  public String getNotifications() {
+    try {
+      String url = baseUrl + "/api/users/notifications?fields=id,content,metadata&$top=5";
+
+      HttpRequest request =
+          HttpRequest.newBuilder()
+              .uri(URI.create(url))
+              .header("Authorization", "Bearer " + token)
+              .GET()
+              .build();
+
+      HttpResponse<String> response =
+          HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+      if (response.statusCode() == 200) {
+        return response.body();
+      } else {
+        return "Error: " + response.statusCode();
+      }
+    } catch (Exception e) {
+      return "Error: " + e.getMessage();
+    }
+  }
 }
