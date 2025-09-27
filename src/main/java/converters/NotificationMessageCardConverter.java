@@ -3,8 +3,8 @@ package converters;
 import entities.MessageCard;
 import entities.MessageCardSection;
 import entities.Notification;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class NotificationMessageCardConverter {
 
@@ -60,6 +60,6 @@ public class NotificationMessageCardConverter {
         "https://schema.org/extensions",
         "FF8C00",
         "YouTrack Notification",
-        Arrays.asList(section));
+        List.of(section));
   }
 }

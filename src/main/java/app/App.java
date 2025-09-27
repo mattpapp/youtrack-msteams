@@ -7,6 +7,7 @@ import converters.NotificationMessageCardConverter;
 import entities.MessageCard;
 import entities.Notification;
 import java.util.List;
+import utils.NotificationTracker;
 
 public class App {
   public static void main(String[] args) {
@@ -25,11 +26,23 @@ public class App {
 
     if (!notifications.isEmpty()) {
       Notification latestNotification = notifications.get(notifications.size() - 1);
-      MessageCard messageCard = NotificationMessageCardConverter.convert(latestNotification);
-      boolean success = teamsClient.sendMessageCard(messageCard);
-      System.out.println("MessageCard sent: " + success);
+      String latestId = latestNotification.getId();
+
+      if (NotificationTracker.isNewNotification(latestId)) {
+        MessageCard messageCard = NotificationMessageCardConverter.convert(latestNotification);
+        boolean success = teamsClient.sendMessageCard(messageCard);
+
+        if (success) {
+          NotificationTracker.markAsSent(latestId);
+          System.out.println("New notification sent to Teams");
+        } else {
+          System.out.println("Failed to send notification to Teams");
+        }
+      } else {
+        System.out.println("No new notifications, skipping...");
+      }
     } else {
-      System.out.println("No notifications found to send");
+      System.out.println("No notifications found");
     }
   }
 }
