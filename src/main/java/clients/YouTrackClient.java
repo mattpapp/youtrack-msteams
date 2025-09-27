@@ -87,6 +87,39 @@ public class YouTrackClient {
     }
   }
 
+  public String createIssue(String projectId, String summary) {
+    try {
+      String url = baseUrl + "/api/issues";
+      
+      String jsonPayload = String.format(
+        "{\"project\":{\"id\":\"%s\"},\"summary\":\"%s\"}", 
+        projectId, summary.replace("\"", "\\\""));
+
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(url))
+          .header("Authorization", "Bearer " + token)
+          .header("Content-Type", "application/json")
+          .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+          .build();
+
+      HttpResponse<String> response = HttpClient.newHttpClient()
+          .send(request, HttpResponse.BodyHandlers.ofString());
+
+      if (response.statusCode() == 200 || response.statusCode() == 201) {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode responseJson = mapper.readTree(response.body());
+        return responseJson.get("id").asText();
+      } else {
+        System.err.println("YouTrack create issue API error: HTTP " + response.statusCode());
+        System.err.println("Response: " + response.body());
+        return null;
+      }
+    } catch (Exception e) {
+      System.err.println("Failed to create YouTrack issue: " + e.getMessage());
+      return null;
+    }
+  }
+
   private String decodeBase64Gzip(String encoded) {
     try {
       byte[] decodedBytes = java.util.Base64.getDecoder().decode(encoded);
