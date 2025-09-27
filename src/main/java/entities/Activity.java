@@ -1,5 +1,8 @@
 package entities;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,8 +52,20 @@ public class Activity {
     }
   }
 
+  public String getFormattedTimestamp() {
+    if (timestamp == 0) {
+      return "unknown time";
+    }
+
+    Instant instant = Instant.ofEpochMilli(timestamp);
+    DateTimeFormatter formatter =
+        DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
+    return formatter.format(instant);
+  }
+
   @Override
   public String toString() {
-    return String.format("%s %s at %d", authorLogin, getActivityDescription(), timestamp);
+    return String.format(
+        "%s %s at %s", authorLogin, getActivityDescription(), getFormattedTimestamp());
   }
 }
