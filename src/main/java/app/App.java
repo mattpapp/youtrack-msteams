@@ -24,8 +24,8 @@ public class App {
     TeamsClient teamsClient = new TeamsClient(config.teamsWebhookUrl);
 
     if (!notifications.isEmpty()) {
-      Notification firstNotification = notifications.get(0);
-      MessageCard messageCard = NotificationMessageCardConverter.convert(firstNotification);
+      Notification latestNotification = notifications.get(notifications.size() - 1);
+      MessageCard messageCard = NotificationMessageCardConverter.convert(latestNotification);
       boolean success = teamsClient.sendMessageCard(messageCard);
       System.out.println("MessageCard sent: " + success);
     } else {
