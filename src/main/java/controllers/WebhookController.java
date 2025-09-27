@@ -40,7 +40,7 @@ public class WebhookController {
     if (textObj instanceof String) {
       return (String) textObj;
     } else if (textObj instanceof List<?> textList) {
-        return textList.isEmpty() ? null : textList.get(0).toString();
+      return textList.isEmpty() ? null : textList.get(0).toString();
     }
     return null;
   }
