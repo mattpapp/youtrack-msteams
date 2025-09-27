@@ -90,20 +90,22 @@ public class YouTrackClient {
   public String createIssue(String projectId, String summary) {
     try {
       String url = baseUrl + "/api/issues";
-      
-      String jsonPayload = String.format(
-        "{\"project\":{\"id\":\"%s\"},\"summary\":\"%s\"}", 
-        projectId, summary.replace("\"", "\\\""));
 
-      HttpRequest request = HttpRequest.newBuilder()
-          .uri(URI.create(url))
-          .header("Authorization", "Bearer " + token)
-          .header("Content-Type", "application/json")
-          .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-          .build();
+      String jsonPayload =
+          String.format(
+              "{\"project\":{\"id\":\"%s\"},\"summary\":\"%s\"}",
+              projectId, summary.replace("\"", "\\\""));
 
-      HttpResponse<String> response = HttpClient.newHttpClient()
-          .send(request, HttpResponse.BodyHandlers.ofString());
+      HttpRequest request =
+          HttpRequest.newBuilder()
+              .uri(URI.create(url))
+              .header("Authorization", "Bearer " + token)
+              .header("Content-Type", "application/json")
+              .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+              .build();
+
+      HttpResponse<String> response =
+          HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
       if (response.statusCode() == 200 || response.statusCode() == 201) {
         ObjectMapper mapper = new ObjectMapper();
