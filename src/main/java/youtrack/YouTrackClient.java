@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 public class YouTrackClient {
   private final String baseUrl;
@@ -67,6 +69,52 @@ public class YouTrackClient {
       }
     } catch (Exception e) {
       return "Error: " + e.getMessage();
+    }
+  }
+
+  public List<Activity> getActivityList() {
+    try {
+      String jsonResponse = getActivities();
+      if (jsonResponse.startsWith("Error:")) {
+        return new ArrayList<>();
+      }
+
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode root = mapper.readTree(jsonResponse);
+      List<Activity> activities = new ArrayList<>();
+
+      for (JsonNode node : root) {
+        Activity activity = new Activity();
+        activity.setId(node.get("id").asText());
+        activity.setActivityType(node.get("$type").asText());
+        activity.setTimestamp(node.get("timestamp").asLong());
+
+        if (node.has("author") && node.get("author").has("login")) {
+          activity.setAuthorLogin(node.get("author").get("login").asText());
+        }
+
+        if (node.has("target") && !node.get("target").isNull()) {
+          JsonNode target = node.get("target");
+
+          if (target.has("id") && !target.get("id").isNull()) {
+            activity.setTargetId(target.get("id").asText());
+          }
+
+          if (target.has("$type") && !target.get("$type").isNull()) {
+            activity.setTargetType(target.get("$type").asText());
+          }
+
+          if (target.has("idReadable") && !target.get("idReadable").isNull()) {
+            activity.setTargetReadableId(target.get("idReadable").asText());
+          }
+        }
+
+        activities.add(activity);
+      }
+
+      return activities;
+    } catch (Exception e) {
+      return new ArrayList<>();
     }
   }
 }
