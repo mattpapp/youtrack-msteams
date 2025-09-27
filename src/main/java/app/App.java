@@ -3,9 +3,9 @@ package app;
 import clients.TeamsClient;
 import clients.YouTrackClient;
 import config.Config;
-import converters.ActivityMessageCardConverter;
-import entities.Activity;
+import converters.NotificationMessageCardConverter;
 import entities.MessageCard;
+import entities.Notification;
 import java.util.List;
 
 public class App {
@@ -13,22 +13,23 @@ public class App {
     Config config = new Config();
     YouTrackClient client = new YouTrackClient(config.ytBaseUrl, config.ytToken);
 
-    int count = client.getActivityCount();
-    System.out.println("Found " + count + " activities");
+    List<Notification> notifications = client.getNotificationList();
+    System.out.println("Found " + notifications.size() + " notifications");
 
-    List<Activity> activities = client.getActivityList();
-    System.out.println("\nRecent activities:");
-    for (Activity activity : activities) {
-      System.out.println("- " + activity.toString());
+    System.out.println("\nRecent notifications:");
+    for (Notification notification : notifications) {
+      System.out.println("- " + notification.toString());
     }
 
     TeamsClient teamsClient = new TeamsClient(config.teamsWebhookUrl);
 
-    if (!activities.isEmpty()) {
-      Activity firstActivity = activities.get(0);
-      MessageCard messageCard = ActivityMessageCardConverter.convert(firstActivity);
+    if (!notifications.isEmpty()) {
+      Notification firstNotification = notifications.get(0);
+      MessageCard messageCard = NotificationMessageCardConverter.convert(firstNotification);
       boolean success = teamsClient.sendMessageCard(messageCard);
       System.out.println("MessageCard sent: " + success);
+    } else {
+      System.out.println("No notifications found to send");
     }
   }
 }
