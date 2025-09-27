@@ -16,9 +16,11 @@ public class YouTrackClient {
     this.token = token;
   }
 
-  public int getNotificationCount() {
+  public int getActivityCount() {
     try {
-      String url = baseUrl + "/api/users/notifications";
+      String url =
+          baseUrl
+              + "/api/activities?categories=IssueCreatedCategory,CommentsCategory,CustomFieldCategory&reverse=true&$top=10";
 
       HttpRequest request =
           HttpRequest.newBuilder()
@@ -42,9 +44,11 @@ public class YouTrackClient {
     }
   }
 
-  public String getNotifications() {
+  public String getActivities() {
     try {
-      String url = baseUrl + "/api/users/notifications?fields=id,content,metadata&$top=5";
+      String url =
+          baseUrl
+              + "/api/activities?categories=IssueCreatedCategory,CommentsCategory,CustomFieldCategory&reverse=true&$top=10&fields=id,author(login),timestamp,target(id,idReadable)";
 
       HttpRequest request =
           HttpRequest.newBuilder()
