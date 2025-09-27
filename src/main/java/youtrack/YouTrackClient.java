@@ -1,5 +1,7 @@
 package youtrack;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -29,7 +31,9 @@ public class YouTrackClient {
           HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
       if (response.statusCode() == 200) {
-        return 1;
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(response.body());
+        return root.size();
       } else {
         return 0;
       }
