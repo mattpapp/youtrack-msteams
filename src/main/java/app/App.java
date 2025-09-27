@@ -13,36 +13,49 @@ public class App {
   public static void main(String[] args) {
     Config config = new Config();
     YouTrackClient client = new YouTrackClient(config.ytBaseUrl, config.ytToken);
-
-    List<Notification> notifications = client.getNotificationList();
-    System.out.println("Found " + notifications.size() + " notifications");
-
-    System.out.println("\nRecent notifications:");
-    for (Notification notification : notifications) {
-      System.out.println("- " + notification.toString());
-    }
-
     TeamsClient teamsClient = new TeamsClient(config.teamsWebhookUrl);
 
-    if (!notifications.isEmpty()) {
-      Notification latestNotification = notifications.get(notifications.size() - 1);
-      String latestId = latestNotification.getId();
+    System.out.println("Starting notification monitor...");
+    System.out.println("Checking for new ones every 15 seconds");
 
-      if (NotificationTracker.isNewNotification(latestId)) {
-        MessageCard messageCard = NotificationMessageCardConverter.convert(latestNotification);
-        boolean success = teamsClient.sendMessageCard(messageCard);
+    while (true) {
+      try {
+        List<Notification> notifications = client.getNotificationList();
+        System.out.println(
+            "[" + java.time.LocalTime.now() + "] Found " + notifications.size() + " notifications");
 
-        if (success) {
-          NotificationTracker.markAsSent(latestId);
-          System.out.println("New notification sent to Teams");
+        if (!notifications.isEmpty()) {
+          Notification latestNotification = notifications.get(notifications.size() - 1);
+          String latestId = latestNotification.getId();
+
+          if (NotificationTracker.isNewNotification(latestId)) {
+            System.out.println("New notification detected: " + latestNotification);
+
+            MessageCard messageCard = NotificationMessageCardConverter.convert(latestNotification);
+            boolean success = teamsClient.sendMessageCard(messageCard);
+
+            if (success) {
+              NotificationTracker.markAsSent(latestId);
+              System.out.println("Notification sent to Teams successfully");
+            } else {
+              System.out.println("Failed to send notification to Teams");
+            }
+          } else {
+            System.out.println("No new notifications");
+          }
         } else {
-          System.out.println("Failed to send notification to Teams");
+          System.out.println("No notifications found");
         }
-      } else {
-        System.out.println("No new notifications, skipping...");
+
+        Thread.sleep(15000);
+      } catch (Exception e) {
+        System.err.println("Error: " + e.getMessage());
+        try {
+          Thread.sleep(15000);
+        } catch (InterruptedException ie) {
+          break;
+        }
       }
-    } else {
-      System.out.println("No notifications found");
     }
   }
 }

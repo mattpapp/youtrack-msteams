@@ -7,13 +7,17 @@ import java.nio.file.Paths;
 
 public class NotificationTracker {
   private static final String LAST_SENT_FILE = ".last_sent";
+  private static String cachedLastSent = null;
 
   public static boolean isNewNotification(String notificationId) {
-    String lastSent = getLastSent();
-    return !notificationId.equals(lastSent);
+    if (cachedLastSent == null) {
+      cachedLastSent = getLastSent();
+    }
+    return !notificationId.equals(cachedLastSent);
   }
 
   public static void markAsSent(String notificationId) {
+    cachedLastSent = notificationId;
     try {
       Files.writeString(Paths.get(LAST_SENT_FILE), notificationId);
     } catch (IOException ignored) {

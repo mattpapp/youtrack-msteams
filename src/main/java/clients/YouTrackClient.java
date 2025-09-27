@@ -63,7 +63,7 @@ public class YouTrackClient {
 
   public String getNotifications() {
     try {
-      String url = baseUrl + "/api/users/notifications?fields=id,content,metadata&$top=10";
+      String url = baseUrl + "/api/users/notifications?fields=id,content,metadata&$top=50";
 
       HttpRequest request =
           HttpRequest.newBuilder()
